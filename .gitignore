@@ -1,0 +1,106 @@
+# Environment variables and secrets
+.env
+.env.*
+*.env
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Project specific - cache and user data
+cache/
+*.json
+!package.json
+!package-lock.json
+!tsconfig.json
+
+# Logs and temporary files
+*.log
+logs/
+*.pid
+*.seed
+*.pid.lock
+tmp/
+temp/
+*.tmp
+*.temp
+*.bak
+*.backup
+*.old
+
+# Testing and coverage
+.coverage
+.pytest_cache/
+htmlcov/
+.tox/
+.nox/
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Security sensitive files
+*.pem
+*.key
+*.cert
+*.crt
+config.py
+secrets.py
+credentials.json
+token.json
+
+# Session data
+flask_session/
+instance/
+
+# OS generated files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.Spotlight-V100
+.Trashes
+
+# Test files that might contain sensitive data
+test_*.py
+*_test.py
