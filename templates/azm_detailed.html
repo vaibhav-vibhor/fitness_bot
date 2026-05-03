@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card">
+    <h2>⚡ Active Zone Minutes (AZM) Details</h2>
+    <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">← Back to Dashboard</a>
+</div>
+
+{% if azm_data %}
+    {% if azm_data['activities-active-zone-minutes'] %}
+    <div class="card">
+        <h3>🔥 Today's Active Zone Minutes Breakdown</h3>
+        {% for azm_entry in azm_data['activities-active-zone-minutes'] %}
+        {% set azm_value = azm_entry.value %}
+        
+        <div class="data-grid">
+            <div class="data-card">
+                <div class="data-value">{{ azm_value.fatBurnActiveZoneMinutes or 0 }}</div>
+                <div class="data-label">Fat Burn Zone (mins)</div>
+            </div>
+            <div class="data-card">
+                <div class="data-value">{{ azm_value.cardioActiveZoneMinutes or 0 }}</div>
+                <div class="data-label">Cardio Zone (mins)</div>
+            </div>
+            <div class="data-card">
+                <div class="data-value">{{ azm_value.peakActiveZoneMinutes or 0 }}</div>
+                <div class="data-label">Peak Zone (mins)</div>
+            </div>
+            <div class="data-card">
+                <div class="data-value">{{ azm_value.activeZoneMinutes or 0 }}</div>
+                <div class="data-label">Total AZM</div>
+            </div>
+        </div>
+
+        <div style="margin-top: 20px;">
+            <h4>📊 Zone Distribution</h4>
+            <div style="background: #f8f9fa; padding: 20px; border-radius: 10px;">
+                {% set total_minutes = (azm_value.fatBurnActiveZoneMinutes or 0) + (azm_value.cardioActiveZoneMinutes or 0) + (azm_value.peakActiveZoneMinutes or 0) %}
+                
+                {% if total_minutes > 0 %}
+                <div style="margin-bottom: 15px;">
+                    <div style="display: flex; height: 30px; border-radius: 15px; overflow: hidden; background: #e0e0e0;">
+                        {% if azm_value.fatBurnActiveZoneMinutes %}
+                        <div style="background: #ffbb33; width: {{ (azm_value.fatBurnActiveZoneMinutes / total_minutes * 100) }}%; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; font-weight: bold;">
+                            {% if (azm_value.fatBurnActiveZoneMinutes / total_minutes * 100) > 15 %}Fat Burn{% endif %}
+                        </div>
+                        {% endif %}
+                        {% if azm_value.cardioActiveZoneMinutes %}
+                        <div style="background: #ff8800; width: {{ (azm_value.cardioActiveZoneMinutes / total_minutes * 100) }}%; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; font-weight: bold;">
+                            {% if (azm_value.cardioActiveZoneMinutes / total_minutes * 100) > 15 %}Cardio{% endif %}
+                        </div>
+                        {% endif %}
+                        {% if azm_value.peakActiveZoneMinutes %}
+                        <div style="background: #ff4444; width: {{ (azm_value.peakActiveZoneMinutes / total_minutes * 100) }}%; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; font-weight: bold;">
+                            {% if (azm_value.peakActiveZoneMinutes / total_minutes * 100) > 15 %}Peak{% endif %}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; text-align: center;">
+                    <div>
+                        <div style="color: #ffbb33; font-weight: bold;">Fat Burn Zone</div>
+                        <div>{{ ((azm_value.fatBurnActiveZoneMinutes or 0) / total_minutes * 100) | round(1) }}%</div>
+                        <small>Light to moderate intensity</small>
+                    </div>
+                    <div>
+                        <div style="color: #ff8800; font-weight: bold;">Cardio Zone</div>
+                        <div>{{ ((azm_value.cardioActiveZoneMinutes or 0) / total_minutes * 100) | round(1) }}%</div>
+                        <small>Moderate to vigorous intensity</small>
+                    </div>
+                    <div>
+                        <div style="color: #ff4444; font-weight: bold;">Peak Zone</div>
+                        <div>{{ ((azm_value.peakActiveZoneMinutes or 0) / total_minutes * 100) | round(1) }}%</div>
+                        <small>High intensity</small>
+                    </div>
+                </div>
+                {% else %}
+                <p style="text-align: center; color: #666;">No Active Zone Minutes recorded for today</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card" style="margin-top: 20px; background: #e8f5e8;">
+            <h4>💡 About Active Zone Minutes</h4>
+            <p><strong>Active Zone Minutes</strong> are earned for time spent in fat burn, cardio, or peak heart rate zones.</p>
+            <ul style="margin: 10px 0; padding-left: 20px;">
+                <li><strong>Fat Burn Zone:</strong> 50-69% of max heart rate - burns fat, improves endurance</li>
+                <li><strong>Cardio Zone:</strong> 70-84% of max heart rate - improves cardiovascular fitness</li>
+                <li><strong>Peak Zone:</strong> 85-100% of max heart rate - improves performance and power</li>
+            </ul>
+            <p><em>Goal: Aim for at least 150 minutes of moderate intensity or 75 minutes of vigorous intensity per week (WHO guidelines)</em></p>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="card">
+        <p>No Active Zone Minutes data available for today. Make sure your Fitbit device is tracking your heart rate during activities.</p>
+    </div>
+    {% endif %}
+{% else %}
+<div class="error">
+    <strong>Error:</strong> Unable to load Active Zone Minutes data. Please try again later.
+</div>
+{% endif %}
+{% endblock %}

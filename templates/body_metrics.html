@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card">
+    <h2>{{ title or "⚖️ Body & Weight Metrics (Past Week)" }}</h2>
+    <a href="/dashboard" class="btn btn-secondary">← Back to Dashboard</a>
+    
+    <!-- Date Range Selection -->
+    <div style="margin: 20px 0; padding: 15px; background: #f8f9fa; border-radius: 5px;">
+        <h4 style="margin-bottom: 10px;">📅 Select Date Range:</h4>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <a href="/body?days=7" 
+               class="btn {{ 'btn-primary' if current_days == 7 else '' }}" 
+               style="background: {{ '#2196F3' if current_days == 7 else '#6c757d' }};">
+                1 Week
+            </a>
+            <a href="/body?days=30" 
+               class="btn {{ 'btn-primary' if current_days == 30 else '' }}" 
+               style="background: {{ '#2196F3' if current_days == 30 else '#6c757d' }};">
+                1 Month
+            </a>
+            <a href="/body?days=90" 
+               class="btn {{ 'btn-primary' if current_days == 90 else '' }}" 
+               style="background: {{ '#2196F3' if current_days == 90 else '#6c757d' }};">
+                3 Months
+            </a>
+            <a href="/body?days=180" 
+               class="btn {{ 'btn-primary' if current_days == 180 else '' }}" 
+               style="background: {{ '#2196F3' if current_days == 180 else '#6c757d' }};">
+                6 Months
+            </a>
+        </div>
+    </div>
+</div>
+
+{% if error %}
+<div class="error">
+    <strong>Error:</strong> {{ error }}
+</div>
+{% elif body_data %}
+
+<!-- Summary Statistics -->
+{% if total_days_with_data > 0 %}
+<div class="card">
+    <h3>📊 Body Metrics Summary Statistics</h3>
+    <div class="data-grid">
+        <div class="data-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+            <div class="data-value" style="color: white !important;">{{ avg_weight or 'N/A' }}{{ ' kg' if avg_weight != 'N/A' else '' }}</div>
+            <div class="data-label" style="color: white !important;">Average Weight</div>
+        </div>
+        <div class="data-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white;">
+            <div class="data-value" style="color: white !important;">{{ avg_bmi or 'N/A' }}</div>
+            <div class="data-label" style="color: white !important;">Average BMI</div>
+        </div>
+        <div class="data-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white;">
+            <div class="data-value" style="color: white !important;">{{ avg_body_fat or 'N/A' }}{{ '%' if avg_body_fat != 'N/A' else '' }}</div>
+            <div class="data-label" style="color: white !important;">Average Body Fat</div>
+        </div>
+        <div class="data-card" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); color: white;">
+            <div class="data-value" style="color: white !important;">
+                {% if weight_change != 'N/A' %}
+                    {{ '+' if weight_change > 0 else '' }}{{ weight_change }} kg
+                {% else %}
+                    N/A
+                {% endif %}
+            </div>
+            <div class="data-label" style="color: white !important;">Weight Change</div>
+        </div>
+        <div class="data-card" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); color: white;">
+            <div class="data-value" style="color: white !important;">{{ total_days_with_data }}</div>
+            <div class="data-label" style="color: white !important;">Days with Data</div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Daily Body Data Table -->
+<div class="card">
+    <h3>🗓️ Daily Body Metrics Data</h3>
+    {% if body_data %}
+    <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; margin-top: 15px;">
+            <thead>
+                <tr style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                    <th style="padding: 12px; text-align: left; border: 1px solid #ddd;">Date</th>
+                    <th style="padding: 12px; text-align: center; border: 1px solid #ddd;">Weight (kg)</th>
+                    <th style="padding: 12px; text-align: center; border: 1px solid #ddd;">BMI</th>
+                    <th style="padding: 12px; text-align: center; border: 1px solid #ddd;">BMI Category</th>
+                    <th style="padding: 12px; text-align: center; border: 1px solid #ddd;">Body Fat %</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for day in body_data %}
+                <tr style="border-bottom: 1px solid #eee;">
+                    <td style="padding: 10px; border: 1px solid #ddd; font-weight: bold;">{{ day.date }}</td>
+                    <td style="padding: 10px; text-align: center; border: 1px solid #ddd;">
+                        {% if day.weight != 'N/A' %}
+                            <span style="font-weight: bold; color: #2196f3;">{{ day.weight }} kg</span>
+                        {% else %}
+                            <span style="color: #999;">No data</span>
+                        {% endif %}
+                    </td>
+                    <td style="padding: 10px; text-align: center; border: 1px solid #ddd;">
+                        {% if day.bmi != 'N/A' %}
+                            <span style="font-weight: bold; color: #4caf50;">{{ day.bmi }}</span>
+                        {% else %}
+                            <span style="color: #999;">N/A</span>
+                        {% endif %}
+                    </td>
+                    <td style="padding: 10px; text-align: center; border: 1px solid #ddd;">
+                        {% if day.bmi_category != 'N/A' %}
+                            <span style="padding: 4px 8px; border-radius: 12px; font-size: 11px; color: white; background: 
+                                {% if day.bmi_category == 'Normal' %}#4caf50
+                                {% elif day.bmi_category == 'Underweight' %}#ff9800
+                                {% elif day.bmi_category == 'Overweight' %}#ff9800
+                                {% elif day.bmi_category == 'Obese' %}#f44336
+                                {% else %}#888{% endif %};">
+                                {{ day.bmi_category }}
+                            </span>
+                        {% else %}
+                            <span style="color: #999;">N/A</span>
+                        {% endif %}
+                    </td>
+                    <td style="padding: 10px; text-align: center; border: 1px solid #ddd;">
+                        {% if day.body_fat != 'N/A' %}
+                            <span style="font-weight: bold; color: #9c27b0;">{{ day.body_fat }}%</span>
+                        {% else %}
+                            <span style="color: #999;">N/A</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p>No body metrics data available for the selected date range.</p>
+    {% endif %}
+</div>
+
+<!-- BMI Guidelines -->
+<div class="card">
+    <h3>💡 BMI & Body Composition Guidelines</h3>
+    <div class="data-grid">
+        <div style="padding: 15px; background: #e8f5e8; border-radius: 8px;">
+            <h4 style="color: #4caf50; margin-top: 0;">✅ BMI Categories</h4>
+            <ul style="margin: 10px 0; color: #666;">
+                <li><strong>Underweight:</strong> BMI < 18.5</li>
+                <li><strong>Normal:</strong> BMI 18.5 - 24.9</li>
+                <li><strong>Overweight:</strong> BMI 25.0 - 29.9</li>
+                <li><strong>Obese:</strong> BMI ≥ 30.0</li>
+            </ul>
+        </div>
+        <div style="padding: 15px; background: #fff8e1; border-radius: 8px;">
+            <h4 style="color: #ff9800; margin-top: 0;">📊 Body Fat Guidelines</h4>
+            <ul style="margin: 10px 0; color: #666;">
+                <li><strong>Men:</strong> 10-20% (Athletic), 21-25% (Acceptable)</li>
+                <li><strong>Women:</strong> 16-25% (Athletic), 26-31% (Acceptable)</li>
+                <li><strong>Note:</strong> Individual goals may vary</li>
+            </ul>
+        </div>
+    </div>
+    <div style="margin-top: 15px; padding: 15px; background: #f0f8ff; border-radius: 8px; border-left: 4px solid #2196f3;">
+        <p style="margin: 0; color: #666;">
+            <strong>💡 Tip:</strong> Body weight can fluctuate daily due to hydration, food intake, and other factors. 
+            Focus on trends over time rather than day-to-day changes for a better understanding of your health progress.
+        </p>
+    </div>
+</div>
+
+{% else %}
+<div class="card">
+    <h3>📋 No Body Metrics Data Available</h3>
+    <p>No body metrics data available for the selected date range. This could be because:</p>
+    <ul>
+        <li>You haven't logged any weight, BMI, or body fat data in your Fitbit app</li>
+        <li>Data hasn't synced to Fitbit servers yet</li>
+        <li>Your Fitbit device doesn't support automatic body composition tracking</li>
+        <li>Manual logging is required for body metrics</li>
+    </ul>
+    <p><strong>Tip:</strong> Use your Fitbit app or a smart scale to log weight and body composition data regularly for tracking trends.</p>
+</div>
+{% endif %}
+{% endblock %}
