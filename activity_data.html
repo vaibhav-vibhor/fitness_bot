@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card">
+    <h2>{{ title }}</h2>
+    <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">← Back to Dashboard</a>
+    
+    <!-- Date Range Selection -->
+    <div style="margin: 20px 0; padding: 15px; background: #f8f9fa; border-radius: 5px;">
+        <h4 style="margin-bottom: 10px;">📅 Select Date Range:</h4>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <a href="{{ url_for('show_steps_history', days=7) }}" 
+               class="btn {{ 'btn-primary' if current_days == 7 else '' }}" 
+               style="{% if current_days == 7 %}background: #2196F3;{% else %}background: #6c757d;{% endif %}">
+                1 Week
+            </a>
+            <a href="{{ url_for('show_steps_history', days=30) }}" 
+               class="btn {{ 'btn-primary' if current_days == 30 else '' }}" 
+               style="{% if current_days == 30 %}background: #2196F3;{% else %}background: #6c757d;{% endif %}">
+                1 Month
+            </a>
+            <a href="{{ url_for('show_steps_history', days=90) }}" 
+               class="btn {{ 'btn-primary' if current_days == 90 else '' }}" 
+               style="{% if current_days == 90 %}background: #2196F3;{% else %}background: #6c757d;{% endif %}">
+                3 Months
+            </a>
+            <a href="{{ url_for('show_steps_history', days=180) }}" 
+               class="btn {{ 'btn-primary' if current_days == 180 else '' }}" 
+               style="{% if current_days == 180 %}background: #2196F3;{% else %}background: #6c757d;{% endif %}">
+                6 Months
+            </a>
+        </div>
+    </div>
+</div>
+
+{% if error %}
+<div class="error">
+    <strong>Error:</strong> {{ error }}
+</div>
+{% else %}
+
+<!-- Average Steps Summary -->
+{% if average_steps is defined and daily_data %}
+<div class="card">
+    <h3>📊 Summary Statistics</h3>
+    <div class="data-grid">
+        <div class="data-card" style="background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%); color: white;">
+            <div class="data-value" style="color: white;">{{ "{:,}".format(average_steps) }}</div>
+            <div class="data-label" style="color: #f0f0f0;">Average Daily Steps</div>
+        </div>
+        <div class="data-card" style="background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%); color: white;">
+            <div class="data-value" style="color: white;">{{ total_days_with_data }}</div>
+            <div class="data-label" style="color: #f0f0f0;">Days with Data</div>
+        </div>
+        {% if total_steps > 0 %}
+        <div class="data-card" style="background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%); color: white;">
+            <div class="data-value" style="color: white;">{{ "{:,}".format(total_steps) }}</div>
+            <div class="data-label" style="color: #f0f0f0;">Total Steps</div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+
+<div class="data-grid">
+    {% if steps_data %}
+    <div class="data-card">
+        <div class="data-value">{{ steps_data }}</div>
+        <div class="data-label">Steps</div>
+    </div>
+    {% endif %}
+    
+    {% if calories_data %}
+    <div class="data-card">
+        <div class="data-value">{{ calories_data }}</div>
+        <div class="data-label">Calories Burned</div>
+    </div>
+    {% endif %}
+    
+    {% if distance_data %}
+    <div class="data-card">
+        <div class="data-value">{{ distance_data }} km</div>
+        <div class="data-label">Distance</div>
+    </div>
+    {% endif %}
+    
+    {% if active_minutes %}
+    <div class="data-card">
+        <div class="data-value">{{ active_minutes }}</div>
+        <div class="data-label">Active Zone Minutes</div>
+    </div>
+    {% endif %}
+</div>
+
+{% if daily_data %}
+<div class="card">
+    <h3>📊 Daily Breakdown</h3>
+    <div style="max-height: 400px; overflow-y: auto;">
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="background: #f5f5f5;">
+                    <th style="padding: 10px; text-align: left; border-bottom: 1px solid #ddd;">Date</th>
+                    <th style="padding: 10px; text-align: center; border-bottom: 1px solid #ddd;">Steps</th>
+                    <th style="padding: 10px; text-align: center; border-bottom: 1px solid #ddd;">Calories</th>
+                    <th style="padding: 10px; text-align: center; border-bottom: 1px solid #ddd;">Distance (km)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for day in daily_data %}
+                <tr>
+                    <td style="padding: 10px; border-bottom: 1px solid #eee;">{{ day.date }}</td>
+                    <td style="padding: 10px; text-align: center; border-bottom: 1px solid #eee;">{{ day.steps or 'N/A' }}</td>
+                    <td style="padding: 10px; text-align: center; border-bottom: 1px solid #eee;">{{ day.calories or 'N/A' }}</td>
+                    <td style="padding: 10px; text-align: center; border-bottom: 1px solid #eee;">{{ day.distance or 'N/A' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+{% endif %}
+{% endblock %}

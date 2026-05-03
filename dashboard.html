@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card">
+    <h2>🎉 Welcome{% if profile and profile.user and profile.user.displayName %}, {{ profile.user.displayName }}{% endif %}!</h2>
+    <p>Your Fitbit account is successfully connected. Choose what health data you'd like to view:</p>
+</div>
+
+<!-- Health Score Widget -->
+{% include 'health_score_widget.html' %}
+
+<div class="data-grid">
+    <div class="data-card">
+        <h3> Steps History</h3>
+        <p>Detailed view of your daily step counts</p>
+        <a href="{{ url_for('show_steps_history') }}" class="btn btn-primary">View Steps</a>
+    </div>
+    
+    <div class="data-card">
+        <h3>❤️ Heart Rate</h3>
+        <p>Resting HR, heart rate zones, HRV data</p>
+        <a href="{{ url_for('show_heart_rate') }}" class="btn btn-secondary">View Heart Rate</a>
+    </div>
+    
+    <div class="data-card">
+        <h3>😴 Sleep Analysis</h3>
+        <p>Sleep stages, duration, efficiency, and patterns</p>
+        <a href="{{ url_for('show_sleep') }}" class="btn">View Sleep Data</a>
+    </div>
+    
+    <div class="data-card">
+        <h3>⚖️ Body Metrics</h3>
+        <p>Weight, BMI, body fat percentage tracking</p>
+        <a href="{{ url_for('show_body_metrics') }}" class="btn btn-primary">View Body Data</a>
+    </div>
+    
+    <div class="data-card">
+        <h3>🏋️‍♂️ Exercise Log</h3>
+        <p>Workouts, activity types, duration, calories</p>
+        <a href="{{ url_for('show_exercise') }}" class="btn btn-secondary">View Exercises</a>
+    </div>
+    
+    <div class="data-card">
+        <h3>🩺 Health Metrics</h3>
+        <p>SpO2, breathing rate, temperature, cardio fitness</p>
+        <a href="{{ url_for('show_health_metrics') }}" class="btn">View Health Metrics</a>
+    </div>
+    
+    <div class="data-card">
+        <h3>⚡ Active Zone Minutes</h3>
+        <p>Fat burn, cardio, and peak zone breakdown</p>
+        <a href="{{ url_for('show_azm_detailed') }}" class="btn btn-primary">View AZM Details</a>
+    </div>
+</div>
+
+<div class="card" style="margin-top: 30px;">
+    <h3>👤 Your Profile</h3>
+    <div style="background: #f8f9fa; padding: 15px; border-radius: 5px;">
+        {% if profile and profile.user %}
+        <p><strong>Name:</strong> {{ profile.user.displayName or 'N/A' }}</p>
+        <p><strong>Member Since:</strong> {{ profile.user.memberSince or 'N/A' }}</p>
+        {% if profile.user.height %}
+        <p><strong>Height:</strong> {{ profile.user.height }} cm</p>
+        {% endif %}
+        {% if profile.user.weight %}
+        <p><strong>Weight:</strong> {{ profile.user.weight }} kg</p>
+        {% endif %}
+        {% else %}
+        <p><em>Profile information not available. Please try logging in again.</em></p>
+        {% endif %}
+    </div>
+    
+    <div style="margin-top: 20px;">
+        <a href="{{ url_for('logout') }}" class="btn" style="background: #f44336;">🔓 Logout</a>
+    </div>
+</div>
+{% endblock %}
